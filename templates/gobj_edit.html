@@ -1,0 +1,61 @@
+<!--<h1 class="page-header">%!=header_list_title%</h1>-->
+<h1 class="page-header">%=header_title%</h1>
+
+<!--<h2 class="sub-header">%=header_title%</h2>-->
+%IF back_url%
+<a href="%=back_url%">Back to listing</a>
+%ENDIF back_url%
+
+<div class="form-horizontal">
+	<form action="%=edit_form_url%" method="post" enctype="multipart/form-data" autocomplete="off" class="ajax_form">
+		<input type="hidden" name="id" value="%=id%" />
+		
+		%SUB klist_edit_comment%
+			<td colspan="2" valign="top"><strong>%=field%</strong></td>
+		%ENDSUB klist_edit_comment%
+		
+		%SUB gedit_item_field%
+		%=field%
+		<div class="form-group">
+			<label for="input_%=name%" class="col-sm-2 control-label">%=label%</label>
+			%IF is_input%
+			<div class="col-lg-4 col-md-6 col-sm-10">
+				<input type="text" name="%=name%" value="%=value%" id="input_%=name%" placeholder=""  class="form-control" />
+			</div>
+			%ELSEIF is_select%
+			<div class="col-lg-4 col-md-6 col-sm-10">
+				select
+			</div>
+			%ELSEIF is_toggle%
+			<div class="col-lg-4 col-md-6 col-sm-10">
+				<input type="checkbox" name="%=name%" value="1"
+							 %=is_on%
+							 data-toggle="toggle" data-on="%=on_label%" data-off="%=off_label%" data-onstyle="success" data-offstyle="danger" />
+			</div>
+			%ELSEIF is_checkbox%
+			<div class="col-lg-4 col-md-6 col-sm-10">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox"> Remember me
+					</label>
+				</div>
+			</div>
+			%ELSE is_input%
+			<div class="col-lg-4 col-md-6 col-sm-10">
+				<p class="form-control-static">%=value%</p>
+			</div>
+			%ENDIF is_input%
+		</div>
+		%ENDSUB gedit_item_field%
+		
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-lg-4 col-md-6 col-sm-10 text-right">
+				<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate ajax_loader_icon"></span>Save</button>
+				<div id="msg" class="alert text-left" style="display: none;" role="alert">...</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+							<font color="red">%=emsg%</font>
+									

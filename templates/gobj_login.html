@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="%=siteurl%favicon.ico">
+    <title>Signin to %=sitename% admin</title>
+    <link href="%=siteurl%css/bootstrap.min.css" rel="stylesheet">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="%=siteurl%css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="%=siteurl%css/style.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<style>
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #eee;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+</style>
+<script src="%=siteurl%js/functions.js"></script>
+<script type="text/javascript">
+//	var ajaxurl = '%=siteurl%index.php';
+</script>
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <form action="index.php?mod=gobj&act=login" method="post" class="form-signin" onsubmit="submitForm($(this)); return false;">
+        <h2 class="form-signin-heading">Please sign in</h2>
+				<div id="msg" class="alert alert-danger" role="alert" style="display: none;"></div>
+				<p class="error">%=error_msg%</p>
+        <label for="username" class="sr-only">Username</label>
+        <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus />
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required />
+        <!--
+				<div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>-->
+        <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate ajax_loader_icon"></span>Sign in</button>
+      </form>
+
+    </div> <!-- /container -->
+
+
+    <script src="%=siteurl%js/jquery.min.js"></script>
+    <script src="%=siteurl%js/bootstrap.min.js"></script>
+  </body>
+</html>
