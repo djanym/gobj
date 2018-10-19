@@ -12,13 +12,7 @@
 /**
  * @since 0.71
  */
-define( 'EZSQL_VERSION', 'WP1.25' );
-
-/**
- * @since 0.71
- */
 define( 'OBJECT', 'OBJECT' );
-define( 'object', 'OBJECT' ); // Back compat.
 
 /**
  * @since 2.5.0
@@ -39,22 +33,22 @@ define( 'ARRAY_N', 'ARRAY_N' );
  * Gobj Database Access Abstraction Object
  *
  * It is possible to replace this class with your own
- * by setting the $wpdb global variable in wp-content/db.php
- * file to your class. The wpdb class will still be included,
+ * by setting the $db global variable in wp-content/db.php
+ * file to your class. The db class will still be included,
  * so you can extend it or simply use your own.
  *
- * @link https://codex.wordpress.org/Function_Reference/wpdb_Class
+ * @link https://codex.wordpress.org/Function_Reference/db_Class
  *
  * @package Gobj
  * @subpackage Database
  * @since 0.71
  */
-class wpdb {
+class db {
 
 	/**
 	 * Whether to show SQL/DB errors.
 	 *
-	 * Default behavior is to show errors if both WP_DEBUG and WP_DEBUG_DISPLAY
+	 * Default behavior is to show errors if both DEBUG_MODE and ERROR_DISPLAY
 	 * evaluated to true.
 	 *
 	 * @since 0.71
@@ -175,7 +169,7 @@ class wpdb {
 	 *
 	 * @since 4.2.0
 	 * @access private
-	 * @see wpdb::check_safe_collation()
+	 * @see db::check_safe_collation()
 	 * @var bool
 	 */
 	private $checking_collation = false;
@@ -203,32 +197,10 @@ class wpdb {
 	 *
 	 * @since 3.9.0
 	 * @access protected
-	 * @see wpdb::check_connection()
+	 * @see db::check_connection()
 	 * @var int
 	 */
 	protected $reconnect_retries = 5;
-
-	/**
-	 * Gobj table prefix
-	 *
-	 * You can set this to have multiple Gobj installations
-	 * in a single database. The second reason is for possible
-	 * security precautions.
-	 *
-	 * @since 2.5.0
-	 * @access public
-	 * @var string
-	 */
-	public $prefix = '';
-
-	/**
-	 * Gobj base table prefix.
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	 public $base_prefix;
 
 	/**
 	 * Whether the database queries are ready to start executing.
@@ -240,253 +212,16 @@ class wpdb {
 	var $ready = false;
 
 	/**
-	 * Blog ID.
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var int
-	 */
-	public $blogid = 0;
-
-	/**
-	 * Site ID.
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var int
-	 */
-	public $siteid = 0;
-
-	/**
-	 * List of Gobj per-blog tables
-	 *
-	 * @since 2.5.0
-	 * @access private
-	 * @see wpdb::tables()
-	 * @var array
-	 */
-	var $tables = array( 'posts', 'comments', 'links', 'options', 'postmeta',
-		'terms', 'term_taxonomy', 'term_relationships', 'termmeta', 'commentmeta' );
-
-	/**
-	 * List of deprecated Gobj tables
-	 *
-	 * categories, post2cat, and link2cat were deprecated in 2.3.0, db version 5539
-	 *
-	 * @since 2.9.0
-	 * @access private
-	 * @see wpdb::tables()
-	 * @var array
-	 */
-	var $old_tables = array( 'categories', 'post2cat', 'link2cat' );
-
-	/**
-	 * List of Gobj global tables
-	 *
-	 * @since 3.0.0
-	 * @access private
-	 * @see wpdb::tables()
-	 * @var array
-	 */
-	var $global_tables = array( 'users', 'usermeta' );
-
-	/**
-	 * List of Multisite global tables
-	 *
-	 * @since 3.0.0
-	 * @access private
-	 * @see wpdb::tables()
-	 * @var array
-	 */
-	var $ms_global_tables = array( 'blogs', 'signups', 'site', 'sitemeta',
-		'sitecategories', 'registration_log', 'blog_versions' );
-
-	/**
-	 * Gobj Comments table
-	 *
-	 * @since 1.5.0
-	 * @access public
-	 * @var string
-	 */
-	public $comments;
-
-	/**
-	 * Gobj Comment Metadata table
-	 *
-	 * @since 2.9.0
-	 * @access public
-	 * @var string
-	 */
-	public $commentmeta;
-
-	/**
-	 * Gobj Links table
-	 *
-	 * @since 1.5.0
-	 * @access public
-	 * @var string
-	 */
-	public $links;
-
-	/**
-	 * Gobj Options table
-	 *
-	 * @since 1.5.0
-	 * @access public
-	 * @var string
-	 */
-	public $options;
-
-	/**
-	 * Gobj Post Metadata table
-	 *
-	 * @since 1.5.0
-	 * @access public
-	 * @var string
-	 */
-	public $postmeta;
-
-	/**
-	 * Gobj Posts table
-	 *
-	 * @since 1.5.0
-	 * @access public
-	 * @var string
-	 */
-	public $posts;
-
-	/**
-	 * Gobj Terms table
-	 *
-	 * @since 2.3.0
-	 * @access public
-	 * @var string
-	 */
-	public $terms;
-
-	/**
-	 * Gobj Term Relationships table
-	 *
-	 * @since 2.3.0
-	 * @access public
-	 * @var string
-	 */
-	public $term_relationships;
-
-	/**
-	 * Gobj Term Taxonomy table
-	 *
-	 * @since 2.3.0
-	 * @access public
-	 * @var string
-	 */
-	public $term_taxonomy;
-
-	/**
-	 * Gobj Term Meta table.
-	 *
-	 * @since 4.4.0
-	 * @access public
-	 * @var string
-	 */
-	public $termmeta;
-
-	//
-	// Global and Multisite tables
-	//
-
-	/**
-	 * Gobj User Metadata table
-	 *
-	 * @since 2.3.0
-	 * @access public
-	 * @var string
-	 */
-	public $usermeta;
-
-	/**
-	 * Gobj Users table
-	 *
-	 * @since 1.5.0
-	 * @access public
-	 * @var string
-	 */
-	public $users;
-
-	/**
-	 * Multisite Blogs table
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	public $blogs;
-
-	/**
-	 * Multisite Blog Versions table
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	public $blog_versions;
-
-	/**
-	 * Multisite Registration Log table
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	public $registration_log;
-
-	/**
-	 * Multisite Signups table
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	public $signups;
-
-	/**
-	 * Multisite Sites table
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	public $site;
-
-	/**
-	 * Multisite Sitewide Terms table
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	public $sitecategories;
-
-	/**
-	 * Multisite Site Metadata table
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 * @var string
-	 */
-	public $sitemeta;
-
-	/**
 	 * Format specifiers for DB columns. Columns not listed here default to %s. Initialized during WP load.
 	 *
 	 * Keys are column names, values are format types: 'ID' => '%d'
 	 *
 	 * @since 2.8.0
-	 * @see wpdb::prepare()
-	 * @see wpdb::insert()
-	 * @see wpdb::update()
-	 * @see wpdb::delete()
-	 * @see wp_set_wpdb_vars()
+	 * @see db::prepare()
+	 * @see db::insert()
+	 * @see db::update()
+	 * @see db::delete()
+	 * @see wp_set_db_vars()
 	 * @access public
 	 * @var array
 	 */
@@ -626,7 +361,7 @@ class wpdb {
 	public function __construct( $dbuser, $dbpassword, $dbname, $dbhost ) {
 		register_shutdown_function( array( $this, '__destruct' ) );
 
-		if ( WP_DEBUG && WP_DEBUG_DISPLAY )
+		if ( DEBUG_MODE && ERROR_DISPLAY )
 			$this->show_errors();
 
 		/* Use ext/mysqli if it exists and:
@@ -661,7 +396,7 @@ class wpdb {
 	/**
 	 * PHP5 style destructor and will run when database object is destroyed.
 	 *
-	 * @see wpdb::__construct()
+	 * @see db::__construct()
 	 * @since 2.0.8
 	 * @return true
 	 */
@@ -909,170 +644,6 @@ class wpdb {
 	}
 
 	/**
-	 * Sets the table prefix for the Gobj tables.
-	 *
-	 * @since 2.5.0
-	 *
-	 * @param string $prefix          Alphanumeric name for the new prefix.
-	 * @param bool   $set_table_names Optional. Whether the table names, e.g. wpdb::$posts, should be updated or not.
-	 * @return string|Error Old prefix or Error on error
-	 */
-	public function set_prefix( $prefix, $set_table_names = true ) {
-
-		if ( preg_match( '|[^a-z0-9_]|i', $prefix ) )
-			return new Error('invalid_db_prefix', 'Invalid database prefix' );
-
-		$old_prefix = is_multisite() ? '' : $prefix;
-
-		if ( isset( $this->base_prefix ) )
-			$old_prefix = $this->base_prefix;
-
-		$this->base_prefix = $prefix;
-
-		if ( $set_table_names ) {
-			foreach ( $this->tables( 'global' ) as $table => $prefixed_table )
-				$this->$table = $prefixed_table;
-
-			if ( is_multisite() && empty( $this->blogid ) )
-				return $old_prefix;
-
-			$this->prefix = $this->get_blog_prefix();
-
-			foreach ( $this->tables( 'blog' ) as $table => $prefixed_table )
-				$this->$table = $prefixed_table;
-
-			foreach ( $this->tables( 'old' ) as $table => $prefixed_table )
-				$this->$table = $prefixed_table;
-		}
-		return $old_prefix;
-	}
-
-	/**
-	 * Sets blog id.
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 *
-	 * @param int $blog_id
-	 * @param int $site_id Optional.
-	 * @return int previous blog id
-	 */
-	public function set_blog_id( $blog_id, $site_id = 0 ) {
-		if ( ! empty( $site_id ) )
-			$this->siteid = $site_id;
-
-		$old_blog_id  = $this->blogid;
-		$this->blogid = $blog_id;
-
-		$this->prefix = $this->get_blog_prefix();
-
-		foreach ( $this->tables( 'blog' ) as $table => $prefixed_table )
-			$this->$table = $prefixed_table;
-
-		foreach ( $this->tables( 'old' ) as $table => $prefixed_table )
-			$this->$table = $prefixed_table;
-
-		return $old_blog_id;
-	}
-
-	/**
-	 * Gets blog prefix.
-	 *
-	 * @since 3.0.0
-	 * @param int $blog_id Optional.
-	 * @return string Blog prefix.
-	 */
-	public function get_blog_prefix( $blog_id = null ) {
-		if ( is_multisite() ) {
-			if ( null === $blog_id )
-				$blog_id = $this->blogid;
-			$blog_id = (int) $blog_id;
-			if ( defined( 'MULTISITE' ) && ( 0 == $blog_id || 1 == $blog_id ) )
-				return $this->base_prefix;
-			else
-				return $this->base_prefix . $blog_id . '_';
-		} else {
-			return $this->base_prefix;
-		}
-	}
-
-	/**
-	 * Returns an array of Gobj tables.
-	 *
-	 * Also allows for the CUSTOM_USER_TABLE and CUSTOM_USER_META_TABLE to
-	 * override the Gobj users and usermeta tables that would otherwise
-	 * be determined by the prefix.
-	 *
-	 * The scope argument can take one of the following:
-	 *
-	 * 'all' - returns 'all' and 'global' tables. No old tables are returned.
-	 * 'blog' - returns the blog-level tables for the queried blog.
-	 * 'global' - returns the global tables for the installation, returning multisite tables only if running multisite.
-	 * 'ms_global' - returns the multisite global tables, regardless if current installation is multisite.
-	 * 'old' - returns tables which are deprecated.
-	 *
-	 * @since 3.0.0
-	 * @uses wpdb::$tables
-	 * @uses wpdb::$old_tables
-	 * @uses wpdb::$global_tables
-	 * @uses wpdb::$ms_global_tables
-	 *
-	 * @param string $scope   Optional. Can be all, global, ms_global, blog, or old tables. Defaults to all.
-	 * @param bool   $prefix  Optional. Whether to include table prefixes. Default true. If blog
-	 *                        prefix is requested, then the custom users and usermeta tables will be mapped.
-	 * @param int    $blog_id Optional. The blog_id to prefix. Defaults to wpdb::$blogid. Used only when prefix is requested.
-	 * @return array Table names. When a prefix is requested, the key is the unprefixed table name.
-	 */
-	public function tables( $scope = 'all', $prefix = true, $blog_id = 0 ) {
-		switch ( $scope ) {
-			case 'all' :
-				$tables = array_merge( $this->global_tables, $this->tables );
-				if ( is_multisite() )
-					$tables = array_merge( $tables, $this->ms_global_tables );
-				break;
-			case 'blog' :
-				$tables = $this->tables;
-				break;
-			case 'global' :
-				$tables = $this->global_tables;
-				if ( is_multisite() )
-					$tables = array_merge( $tables, $this->ms_global_tables );
-				break;
-			case 'ms_global' :
-				$tables = $this->ms_global_tables;
-				break;
-			case 'old' :
-				$tables = $this->old_tables;
-				break;
-			default :
-				return array();
-		}
-
-		if ( $prefix ) {
-			if ( ! $blog_id )
-				$blog_id = $this->blogid;
-			$blog_prefix = $this->get_blog_prefix( $blog_id );
-			$base_prefix = $this->base_prefix;
-			$global_tables = array_merge( $this->global_tables, $this->ms_global_tables );
-			foreach ( $tables as $k => $table ) {
-				if ( in_array( $table, $global_tables ) )
-					$tables[ $table ] = $base_prefix . $table;
-				else
-					$tables[ $table ] = $blog_prefix . $table;
-				unset( $tables[ $k ] );
-			}
-
-			if ( isset( $tables['users'] ) && defined( 'CUSTOM_USER_TABLE' ) )
-				$tables['users'] = CUSTOM_USER_TABLE;
-
-			if ( isset( $tables['usermeta'] ) && defined( 'CUSTOM_USER_META_TABLE' ) )
-				$tables['usermeta'] = CUSTOM_USER_META_TABLE;
-		}
-
-		return $tables;
-	}
-
-	/**
 	 * Selects a database using the current database connection.
 	 *
 	 * The database name will be changed based on the current database
@@ -1094,54 +665,51 @@ class wpdb {
 		}
 		if ( ! $success ) {
 			$this->ready = false;
-			if ( ! did_action( 'template_redirect' ) ) {
-				wp_load_translations_early();
 
-				$message = '<h1>' . __( 'Can&#8217;t select database' ) . "</h1>\n";
+            $message = '<h1>' . __( 'Can&#8217;t select database' ) . "</h1>\n";
 
-				$message .= '<p>' . sprintf(
-					/* translators: %s: database name */
-					__( 'We were able to connect to the database server (which means your username and password is okay) but not able to select the %s database.' ),
-					'<code>' . htmlspecialchars( $db, ENT_QUOTES ) . '</code>'
-				) . "</p>\n";
+            $message .= '<p>' . sprintf(
+                /* translators: %s: database name */
+                __( 'We were able to connect to the database server (which means your username and password is okay) but not able to select the %s database.' ),
+                '<code>' . htmlspecialchars( $db, ENT_QUOTES ) . '</code>'
+            ) . "</p>\n";
 
-				$message .= "<ul>\n";
-				$message .= '<li>' . __( 'Are you sure it exists?' ) . "</li>\n";
+            $message .= "<ul>\n";
+            $message .= '<li>' . __( 'Are you sure it exists?' ) . "</li>\n";
 
-				$message .= '<li>' . sprintf(
-					/* translators: 1: database user, 2: database name */
-					__( 'Does the user %1$s have permission to use the %2$s database?' ),
-					'<code>' . htmlspecialchars( $this->dbuser, ENT_QUOTES )  . '</code>',
-					'<code>' . htmlspecialchars( $db, ENT_QUOTES ) . '</code>'
-				) . "</li>\n";
+            $message .= '<li>' . sprintf(
+                /* translators: 1: database user, 2: database name */
+                __( 'Does the user %1$s have permission to use the %2$s database?' ),
+                '<code>' . htmlspecialchars( $this->dbuser, ENT_QUOTES )  . '</code>',
+                '<code>' . htmlspecialchars( $db, ENT_QUOTES ) . '</code>'
+            ) . "</li>\n";
 
-				$message .= '<li>' . sprintf(
-					/* translators: %s: database name */
-					__( 'On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1$s</code>. Could that be the problem?' ),
-					htmlspecialchars( $db, ENT_QUOTES )
-				). "</li>\n";
+            $message .= '<li>' . sprintf(
+                /* translators: %s: database name */
+                __( 'On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1$s</code>. Could that be the problem?' ),
+                htmlspecialchars( $db, ENT_QUOTES )
+            ). "</li>\n";
 
-				$message .= "</ul>\n";
+            $message .= "</ul>\n";
 
-				$message .= '<p>' . sprintf(
-					/* translators: %s: support forums URL */
-					__( 'If you don&#8217;t know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href="%s">Gobj Support Forums</a>.' ),
-					__( 'https://wordpress.org/support/' )
-				) . "</p>\n";
+            $message .= '<p>' . sprintf(
+                /* translators: %s: support forums URL */
+                __( 'If you don&#8217;t know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href="%s">Gobj Support Forums</a>.' ),
+                __( 'https://gobj.org/support/' )
+            ) . "</p>\n";
 
-				$this->bail( $message, 'db_select_fail' );
-			}
+            $this->bail( $message, 'db_select_fail' );
 		}
 	}
 
 	/**
 	 * Do not use, deprecated.
 	 *
-	 * Use esc_sql() or wpdb::prepare() instead.
+	 * Use esc_sql() or db::prepare() instead.
 	 *
 	 * @since 2.8.0
-	 * @deprecated 3.6.0 Use wpdb::prepare()
-	 * @see wpdb::prepare
+	 * @deprecated 3.6.0 Use db::prepare()
+	 * @see db::prepare
 	 * @see esc_sql()
 	 * @access private
 	 *
@@ -1150,7 +718,7 @@ class wpdb {
 	 */
 	function _weak_escape( $string ) {
 		if ( func_num_args() === 1 && function_exists( '_deprecated_function' ) )
-			_deprecated_function( __METHOD__, '3.6.0', 'wpdb::prepare() or esc_sql()' );
+			_deprecated_function( __METHOD__, '3.6.0', 'db::prepare() or esc_sql()' );
 		return addslashes( $string );
 	}
 
@@ -1176,7 +744,7 @@ class wpdb {
 
 		$class = get_class( $this );
 		if ( function_exists( '__' ) ) {
-			/* translators: %s: database access abstraction class, usually wpdb or a class extending wpdb */
+			/* translators: %s: database access abstraction class, usually db or a class extending db */
 			_doing_it_wrong( $class, sprintf( __( '%s must set a database connection for use with escaping.' ), $class ), '3.6.0' );
 		} else {
 			_doing_it_wrong( $class, sprintf( '%s must set a database connection for use with escaping.', $class ), '3.6.0' );
@@ -1187,7 +755,7 @@ class wpdb {
 	/**
 	 * Escape data. Works on arrays.
 	 *
-	 * @uses wpdb::_real_escape()
+	 * @uses db::_real_escape()
 	 * @since  2.8.0
 	 * @access public
 	 *
@@ -1213,11 +781,11 @@ class wpdb {
 	/**
 	 * Do not use, deprecated.
 	 *
-	 * Use esc_sql() or wpdb::prepare() instead.
+	 * Use esc_sql() or db::prepare() instead.
 	 *
 	 * @since 0.71
-	 * @deprecated 3.6.0 Use wpdb::prepare()
-	 * @see wpdb::prepare()
+	 * @deprecated 3.6.0 Use db::prepare()
+	 * @see db::prepare()
 	 * @see esc_sql()
 	 *
 	 * @param mixed $data
@@ -1225,7 +793,7 @@ class wpdb {
 	 */
 	public function escape( $data ) {
 		if ( func_num_args() === 1 && function_exists( '_deprecated_function' ) )
-			_deprecated_function( __METHOD__, '3.6.0', 'wpdb::prepare() or esc_sql()' );
+			_deprecated_function( __METHOD__, '3.6.0', 'db::prepare() or esc_sql()' );
 		if ( is_array( $data ) ) {
 			foreach ( $data as $k => $v ) {
 				if ( is_array( $v ) )
@@ -1243,7 +811,7 @@ class wpdb {
 	/**
 	 * Escapes content by reference for insertion into the database, for security
 	 *
-	 * @uses wpdb::_real_escape()
+	 * @uses db::_real_escape()
 	 *
 	 * @since 2.3.0
 	 *
@@ -1274,8 +842,8 @@ class wpdb {
 	 *
 	 * Both %d and %s should be left unquoted in the query string.
 	 *
-	 *     $wpdb->prepare( "SELECT * FROM `table` WHERE `column` = %s AND `field` = %d", 'foo', 1337 );
-	 *     $wpdb->prepare( "SELECT DATE_FORMAT(`field`, '%%c') FROM `table` WHERE `column` = %s", 'foo' );
+	 *     $db->prepare( "SELECT * FROM `table` WHERE `column` = %s AND `field` = %d", 'foo', 1337 );
+	 *     $db->prepare( "SELECT DATE_FORMAT(`field`, '%%c') FROM `table` WHERE `column` = %s", 'foo' );
 	 *
 	 * @link https://secure.php.net/sprintf Description of syntax.
 	 * @since 2.3.0
@@ -1294,7 +862,7 @@ class wpdb {
 
 		// This is not meant to be foolproof -- but it will catch obviously incorrect usage.
 		if ( strpos( $query, '%' ) === false ) {
-			_doing_it_wrong( 'wpdb::prepare', sprintf( __( 'The query argument of %s must have a placeholder.' ), 'wpdb::prepare()' ), '3.9.0' );
+			_doing_it_wrong( 'db::prepare', sprintf( __( 'The query argument of %s must have a placeholder.' ), 'db::prepare()' ), '3.9.0' );
 		}
 
 		$args = func_get_args();
@@ -1313,25 +881,25 @@ class wpdb {
 	/**
 	 * First half of escaping for LIKE special characters % and _ before preparing for MySQL.
 	 *
-	 * Use this only before wpdb::prepare() or esc_sql().  Reversing the order is very bad for security.
+	 * Use this only before db::prepare() or esc_sql().  Reversing the order is very bad for security.
 	 *
 	 * Example Prepared Statement:
 	 *
 	 *     $wild = '%';
 	 *     $find = 'only 43% of planets';
-	 *     $like = $wild . $wpdb->esc_like( $find ) . $wild;
-	 *     $sql  = $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE post_content LIKE '%s'", $like );
+	 *     $like = $wild . $db->esc_like( $find ) . $wild;
+	 *     $sql  = $db->prepare( "SELECT * FROM $db->posts WHERE post_content LIKE '%s'", $like );
 	 *
 	 * Example Escape Chain:
 	 *
-	 *     $sql  = esc_sql( $wpdb->esc_like( $input ) );
+	 *     $sql  = esc_sql( $db->esc_like( $input ) );
 	 *
 	 * @since 4.0.0
 	 * @access public
 	 *
 	 * @param string $text The raw text to be escaped. The input typed by the user should have no
 	 *                     extra or deleted slashes.
-	 * @return string Text in the form of a LIKE phrase. The output is not SQL safe. Call $wpdb::prepare()
+	 * @return string Text in the form of a LIKE phrase. The output is not SQL safe. Call $db::prepare()
 	 *                or real_escape next.
 	 */
 	public function esc_like( $text ) {
@@ -1382,7 +950,7 @@ class wpdb {
 		$query = htmlspecialchars( $this->last_query, ENT_QUOTES );
 
 		printf(
-			'<div id="error"><p class="wpdberror"><strong>%s</strong> [%s]<br /><code>%s</code></p></div>',
+			'<div id="error"><p class="dberror"><strong>%s</strong> [%s]<br /><code>%s</code></p></div>',
 			__( 'Gobj database error:' ),
 			$str,
 			$query
@@ -1393,12 +961,12 @@ class wpdb {
 	 * Enables showing of database errors.
 	 *
 	 * This function should be used only to enable showing of errors.
-	 * wpdb::hide_errors() should be used instead for hiding of errors. However,
+	 * db::hide_errors() should be used instead for hiding of errors. However,
 	 * this function can be used to enable and disable showing of database
 	 * errors.
 	 *
 	 * @since 0.71
-	 * @see wpdb::hide_errors()
+	 * @see db::hide_errors()
 	 *
 	 * @param bool $show Whether to show or hide errors
 	 * @return bool Old value for showing errors.
@@ -1415,7 +983,7 @@ class wpdb {
 	 * By default database errors are not shown.
 	 *
 	 * @since 0.71
-	 * @see wpdb::show_errors()
+	 * @see db::show_errors()
 	 *
 	 * @return bool Whether showing of errors was active
 	 */
@@ -1432,7 +1000,7 @@ class wpdb {
 	 * call to this function they can be enabled.
 	 *
 	 * @since 2.5.0
-	 * @see wpdb::hide_errors()
+	 * @see db::hide_errors()
 	 * @param bool $suppress Optional. New value. Defaults to true.
 	 * @return bool Old value
 	 */
@@ -1517,7 +1085,7 @@ class wpdb {
 				}
 			}
 
-			if ( WP_DEBUG ) {
+			if ( DEBUG_MODE ) {
 				mysqli_real_connect( $this->dbh, $host, $this->dbuser, $this->dbpassword, null, $port, $socket, $client_flags );
 			} else {
 				@mysqli_real_connect( $this->dbh, $host, $this->dbuser, $this->dbpassword, null, $port, $socket, $client_flags );
@@ -1547,7 +1115,7 @@ class wpdb {
 				}
 			}
 		} else {
-			if ( WP_DEBUG ) {
+			if ( DEBUG_MODE ) {
 				$this->dbh = mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
 			} else {
 				$this->dbh = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
@@ -1634,7 +1202,7 @@ class wpdb {
 		$error_reporting = false;
 
 		// Disable warnings, as we don't want to see a multitude of "unable to connect" messages
-		if ( WP_DEBUG ) {
+		if ( DEBUG_MODE ) {
 			$error_reporting = error_reporting();
 			error_reporting( $error_reporting & ~E_WARNING );
 		}
@@ -1642,7 +1210,7 @@ class wpdb {
 		for ( $tries = 1; $tries <= $this->reconnect_retries; $tries++ ) {
 			// On the last try, re-enable warnings. We want to see a single instance of the
 			// "unable to connect" message on the bail() screen, if it appears.
-			if ( $this->reconnect_retries === $tries && WP_DEBUG ) {
+			if ( $this->reconnect_retries === $tries && DEBUG_MODE ) {
 				error_reporting( $error_reporting );
 			}
 
@@ -1655,12 +1223,6 @@ class wpdb {
 			}
 
 			sleep( 1 );
-		}
-
-		// If template_redirect has already happened, it's too late for wp_die()/dead_db().
-		// Let's just return and hope for the best.
-		if ( did_action( 'template_redirect' ) ) {
-			return false;
 		}
 
 		if ( ! $allow_bail ) {
@@ -1847,7 +1409,7 @@ class wpdb {
 	 * @since 3.9.0
 	 *
 	 * @access private
-	 * @see wpdb::query()
+	 * @see db::query()
 	 *
 	 * @param string $query The query to run.
 	 */
@@ -1871,13 +1433,13 @@ class wpdb {
 	/**
 	 * Insert a row into a table.
 	 *
-	 *     wpdb::insert( 'table', array( 'column' => 'foo', 'field' => 'bar' ) )
-	 *     wpdb::insert( 'table', array( 'column' => 'foo', 'field' => 1337 ), array( '%s', '%d' ) )
+	 *     db::insert( 'table', array( 'column' => 'foo', 'field' => 'bar' ) )
+	 *     db::insert( 'table', array( 'column' => 'foo', 'field' => 1337 ), array( '%s', '%d' ) )
 	 *
 	 * @since 2.5.0
-	 * @see wpdb::prepare()
-	 * @see wpdb::$field_types
-	 * @see wp_set_wpdb_vars()
+	 * @see db::prepare()
+	 * @see db::$field_types
+	 * @see wp_set_db_vars()
 	 *
 	 * @param string       $table  Table name
 	 * @param array        $data   Data to insert (in column => value pairs).
@@ -1886,7 +1448,7 @@ class wpdb {
 	 * @param array|string $format Optional. An array of formats to be mapped to each of the value in $data.
 	 *                             If string, that format will be used for all of the values in $data.
 	 *                             A format is one of '%d', '%f', '%s' (integer, float, string).
-	 *                             If omitted, all values in $data will be treated as strings unless otherwise specified in wpdb::$field_types.
+	 *                             If omitted, all values in $data will be treated as strings unless otherwise specified in db::$field_types.
 	 * @return int|false The number of rows inserted, or false on error.
 	 */
 	public function insert( $table, $data, $format = null ) {
@@ -1896,13 +1458,13 @@ class wpdb {
 	/**
 	 * Replace a row into a table.
 	 *
-	 *     wpdb::replace( 'table', array( 'column' => 'foo', 'field' => 'bar' ) )
-	 *     wpdb::replace( 'table', array( 'column' => 'foo', 'field' => 1337 ), array( '%s', '%d' ) )
+	 *     db::replace( 'table', array( 'column' => 'foo', 'field' => 'bar' ) )
+	 *     db::replace( 'table', array( 'column' => 'foo', 'field' => 1337 ), array( '%s', '%d' ) )
 	 *
 	 * @since 3.0.0
-	 * @see wpdb::prepare()
-	 * @see wpdb::$field_types
-	 * @see wp_set_wpdb_vars()
+	 * @see db::prepare()
+	 * @see db::$field_types
+	 * @see wp_set_db_vars()
 	 *
 	 * @param string       $table  Table name
 	 * @param array        $data   Data to insert (in column => value pairs).
@@ -1911,7 +1473,7 @@ class wpdb {
 	 * @param array|string $format Optional. An array of formats to be mapped to each of the value in $data.
 	 *                             If string, that format will be used for all of the values in $data.
 	 *                             A format is one of '%d', '%f', '%s' (integer, float, string).
-	 *                             If omitted, all values in $data will be treated as strings unless otherwise specified in wpdb::$field_types.
+	 *                             If omitted, all values in $data will be treated as strings unless otherwise specified in db::$field_types.
 	 * @return int|false The number of rows affected, or false on error.
 	 */
 	public function replace( $table, $data, $format = null ) {
@@ -1925,9 +1487,9 @@ class wpdb {
 	 *
 	 * @access private
 	 * @since 3.0.0
-	 * @see wpdb::prepare()
-	 * @see wpdb::$field_types
-	 * @see wp_set_wpdb_vars()
+	 * @see db::prepare()
+	 * @see db::$field_types
+	 * @see wp_set_db_vars()
 	 *
 	 * @param string       $table  Table name
 	 * @param array        $data   Data to insert (in column => value pairs).
@@ -1936,7 +1498,7 @@ class wpdb {
 	 * @param array|string $format Optional. An array of formats to be mapped to each of the value in $data.
 	 *                             If string, that format will be used for all of the values in $data.
 	 *                             A format is one of '%d', '%f', '%s' (integer, float, string).
-	 *                             If omitted, all values in $data will be treated as strings unless otherwise specified in wpdb::$field_types.
+	 *                             If omitted, all values in $data will be treated as strings unless otherwise specified in db::$field_types.
 	 * @param string $type         Optional. What type of operation is this? INSERT or REPLACE. Defaults to INSERT.
 	 * @return int|false The number of rows affected, or false on error.
 	 */
@@ -1975,13 +1537,13 @@ class wpdb {
 	/**
 	 * Update a row in the table
 	 *
-	 *     wpdb::update( 'table', array( 'column' => 'foo', 'field' => 'bar' ), array( 'ID' => 1 ) )
-	 *     wpdb::update( 'table', array( 'column' => 'foo', 'field' => 1337 ), array( 'ID' => 1 ), array( '%s', '%d' ), array( '%d' ) )
+	 *     db::update( 'table', array( 'column' => 'foo', 'field' => 'bar' ), array( 'ID' => 1 ) )
+	 *     db::update( 'table', array( 'column' => 'foo', 'field' => 1337 ), array( 'ID' => 1 ), array( '%s', '%d' ), array( '%d' ) )
 	 *
 	 * @since 2.5.0
-	 * @see wpdb::prepare()
-	 * @see wpdb::$field_types
-	 * @see wp_set_wpdb_vars()
+	 * @see db::prepare()
+	 * @see db::$field_types
+	 * @see wp_set_db_vars()
 	 *
 	 * @param string       $table        Table name
 	 * @param array        $data         Data to update (in column => value pairs).
@@ -1995,7 +1557,7 @@ class wpdb {
 	 * @param array|string $format       Optional. An array of formats to be mapped to each of the values in $data.
 	 *                                   If string, that format will be used for all of the values in $data.
 	 *                                   A format is one of '%d', '%f', '%s' (integer, float, string).
-	 *                                   If omitted, all values in $data will be treated as strings unless otherwise specified in wpdb::$field_types.
+	 *                                   If omitted, all values in $data will be treated as strings unless otherwise specified in db::$field_types.
 	 * @param array|string $where_format Optional. An array of formats to be mapped to each of the values in $where.
 	 *                                   If string, that format will be used for all of the items in $where.
 	 *                                   A format is one of '%d', '%f', '%s' (integer, float, string).
@@ -2048,13 +1610,13 @@ class wpdb {
 	/**
 	 * Delete a row in the table
 	 *
-	 *     wpdb::delete( 'table', array( 'ID' => 1 ) )
-	 *     wpdb::delete( 'table', array( 'ID' => 1 ), array( '%d' ) )
+	 *     db::delete( 'table', array( 'ID' => 1 ) )
+	 *     db::delete( 'table', array( 'ID' => 1 ), array( '%d' ) )
 	 *
 	 * @since 3.4.0
-	 * @see wpdb::prepare()
-	 * @see wpdb::$field_types
-	 * @see wp_set_wpdb_vars()
+	 * @see db::prepare()
+	 * @see db::$field_types
+	 * @see wp_set_db_vars()
 	 *
 	 * @param string       $table        Table name
 	 * @param array        $where        A named array of WHERE clauses (in column => value pairs).
@@ -2064,7 +1626,7 @@ class wpdb {
 	 * @param array|string $where_format Optional. An array of formats to be mapped to each of the values in $where.
 	 *                                   If string, that format will be used for all of the items in $where.
 	 *                                   A format is one of '%d', '%f', '%s' (integer, float, string).
-	 *                                   If omitted, all values in $where will be treated as strings unless otherwise specified in wpdb::$field_types.
+	 *                                   If omitted, all values in $where will be treated as strings unless otherwise specified in db::$field_types.
 	 * @return int|false The number of rows updated, or false on error.
 	 */
 	public function delete( $table, $where, $where_format = null ) {
@@ -2099,7 +1661,7 @@ class wpdb {
 	/**
 	 * Processes arrays of field/value pairs and field formats.
 	 *
-	 * This is a helper method for wpdb's CRUD methods, which take field/value
+	 * This is a helper method for db's CRUD methods, which take field/value
 	 * pairs for inserts, updates, and where clauses. This method first pairs
 	 * each value with a format. Then it determines the charset of that field,
 	 * using that to determine if any invalid text would be stripped. If text is
@@ -2140,7 +1702,7 @@ class wpdb {
 	}
 
 	/**
-	 * Prepares arrays of value/format pairs as passed to wpdb CRUD methods.
+	 * Prepares arrays of value/format pairs as passed to db CRUD methods.
 	 *
 	 * @since 4.2.0
 	 * @access protected
@@ -2176,12 +1738,12 @@ class wpdb {
 
 	/**
 	 * Adds field charsets to field/value/format arrays generated by
-	 * the wpdb::process_field_formats() method.
+	 * the db::process_field_formats() method.
 	 *
 	 * @since 4.2.0
 	 * @access protected
 	 *
-	 * @param array  $data  As it comes from the wpdb::process_field_formats() method.
+	 * @param array  $data  As it comes from the db::process_field_formats() method.
 	 * @param string $table Table name.
 	 * @return array|false The same array as $data with additional 'charset' keys.
 	 */
@@ -2212,7 +1774,7 @@ class wpdb {
 	 * @since 4.2.1
 	 * @access protected
 	 *
-	 * @param array  $data  As it comes from the wpdb::process_field_charsets() method.
+	 * @param array  $data  As it comes from the db::process_field_charsets() method.
 	 * @param string $table Table name.
 	 * @return array|false The same array as $data with additional 'length' keys, or false if
 	 *                     any of the values were too long for their corresponding field.
@@ -2446,7 +2008,7 @@ class wpdb {
 		$table = '`' . implode( '`.`', $table_parts ) . '`';
 		$results = $this->get_results( "SHOW FULL COLUMNS FROM $table" );
 		if ( ! $results ) {
-			return new Error( 'wpdb_get_table_charset_failure' );
+			return new Error( 'db_get_table_charset_failure' );
 		}
 
 		foreach ( $results as $column ) {
@@ -2893,7 +2455,7 @@ class wpdb {
 			$this->check_current_query = false;
 			$row = $this->get_row( "SELECT " . implode( ', ', $sql ), ARRAY_A );
 			if ( ! $row ) {
-				return new Error( 'wpdb_strip_invalid_text_failure' );
+				return new Error( 'db_strip_invalid_text_failure' );
 			}
 
 			foreach ( array_keys( $data ) as $column ) {
@@ -3136,7 +2698,7 @@ class wpdb {
 	/**
 	 * Wraps errors in a nice header and footer and dies.
 	 *
-	 * Will not die if wpdb::$show_errors is false.
+	 * Will not die if db::$show_errors is false.
 	 *
 	 * @since 1.5.0
 	 *
@@ -3153,7 +2715,7 @@ class wpdb {
 			}
 			return false;
 		}
-		wp_die($message);
+		die($message);
 	}
 
 
@@ -3210,15 +2772,15 @@ class wpdb {
 	 *
 	 * Called when Gobj is generating the table scheme.
 	 *
-	 * Use `wpdb::has_cap( 'collation' )`.
+	 * Use `db::has_cap( 'collation' )`.
 	 *
 	 * @since 2.5.0
-	 * @deprecated 3.5.0 Use wpdb::has_cap()
+	 * @deprecated 3.5.0 Use db::has_cap()
 	 *
 	 * @return bool True if collation is supported, false if version does not
 	 */
 	public function supports_collation() {
-		_deprecated_function( __FUNCTION__, '3.5.0', 'wpdb::has_cap( \'collation\' )' );
+		_deprecated_function( __FUNCTION__, '3.5.0', 'db::has_cap( \'collation\' )' );
 		return $this->has_cap( 'collation' );
 	}
 
@@ -3247,7 +2809,7 @@ class wpdb {
 	 * @since 4.1.0 Added support for the 'utf8mb4' feature.
 	 * @since 4.6.0 Added support for the 'utf8mb4_520' feature.
 	 *
-	 * @see wpdb::db_version()
+	 * @see db::db_version()
 	 *
 	 * @param string $db_cap The feature to check for. Accepts 'collation',
 	 *                       'group_concat', 'subqueries', 'set_charset',
@@ -3292,7 +2854,7 @@ class wpdb {
 	}
 
 	/**
-	 * Retrieve the name of the function that called wpdb.
+	 * Retrieve the name of the function that called db.
 	 *
 	 * Searches up the list of functions until it reaches
 	 * the one that would most logically had called this method.
